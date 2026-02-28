@@ -1,0 +1,5 @@
+{
+  "name": "MotoJá Premium 🏍️",
+  "description": "Aplicativo web mobile-first para operação de mototáxi e entregas com mapa em tempo real e IA.",
+  "requestFramePermissions": ["geolocation", "microphone"]
+}

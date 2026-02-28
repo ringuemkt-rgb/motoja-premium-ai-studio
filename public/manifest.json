@@ -1,0 +1,17 @@
+{
+  "name": "MotoJá Premium",
+  "short_name": "MotoJá",
+  "description": "Serviço Premium de Mototáxi e Entregas",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#f27d26",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/198/198416.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
