@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Star, CreditCard, X, CheckCircle2, Bike } from 'lucide-react';
 import { RideStatus, RideState } from '../ribs/ride/types';
-import { RideInteractor } from '../ribs/ride/interactor';
-import { RideRouter } from '../ribs/ride/router';
+import { RideInteractor, RidePresentable } from '../ribs/ride/interactor';
 import { cn } from '../utils/cn';
 
 interface RideFlowProps {
@@ -15,12 +14,17 @@ export default function RideFlow({ interactor }: RideFlowProps) {
   const [destinationInput, setDestinationInput] = useState('');
 
   useEffect(() => {
-    interactor.setUpdateCallback((newState) => {
-      setState(newState);
-      if (newState.status === 'IDLE') {
-        setDestinationInput('');
+    // Implement the Presentable interface
+    const presenter: RidePresentable = {
+      updateState: (newState: RideState) => {
+        setState(newState);
+        if (newState.status === 'IDLE') {
+          setDestinationInput('');
+        }
       }
-    });
+    };
+
+    interactor.setPresenter(presenter);
   }, [interactor]);
 
   if (!state) return null;

@@ -1,12 +1,13 @@
 import { Interactor } from '../core';
-import { RideRouter } from '../ride/router';
 
-export class RootInteractor implements Interactor {
-  didBecomeActive() {
-    console.log('RootInteractor active');
+export class RootInteractor extends Interactor {
+  public didBecomeActive() {
+    super.didBecomeActive();
+    console.log('RootInteractor: Active');
   }
 
-  willResignActive() {
-    console.log('RootInteractor resigning');
+  public willResignActive() {
+    super.willResignActive();
+    console.log('RootInteractor: Resigning');
   }
 }

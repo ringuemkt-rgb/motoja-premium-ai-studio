@@ -1,20 +1,20 @@
-import { Router, RIB } from '../core';
+import { Router } from '../core';
 import { RideInteractor } from './interactor';
 
-export class RideRouter implements Router<RideInteractor>, RIB {
-  id = 'RIDE_RIB';
-  interactor: RideInteractor;
-  private children: RIB[] = [];
+/**
+ * Router for the Ride RIB.
+ * In a real Uber app, this would handle transitions between
+ * 'Requesting', 'Waiting', 'In-Trip', etc.
+ */
+export class RideRouter extends Router<RideInteractor> {
+  public id = 'RIDE_RIB';
 
   constructor(interactor: RideInteractor) {
-    this.interactor = interactor;
+    super(interactor);
   }
 
-  attachChild(child: RIB) {
-    this.children.push(child);
-  }
-
-  detachChild(child: RIB) {
-    this.children = this.children.filter(c => c.id !== child.id);
+  // RIBs specific: attach/detach children
+  public attachPaymentChild() {
+    // Example of attaching a child RIB
   }
 }

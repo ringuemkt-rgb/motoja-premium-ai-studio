@@ -1,16 +1,24 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
-:root {
-  --bg: #0a0a0a;
-  --ink: #ffffff;
-  --accent: #f27d26;
-  --card-bg: #151619;
+@theme {
+  --color-bg-primary: #0B0B0E;
+  --color-surface: #15151A;
+  --color-surface-secondary: #1E1E26;
+  --color-stroke: #25252D;
+  --color-gold: #FFC107;
+  --color-gold-metallic: #D4AF37;
+  --color-gold-light: #FFD86B;
+  --color-gold-dark: #B8860B;
+  --color-text-main: #FFFFFF;
+  --color-text-sec: #B8B8C2;
+  --color-success: #3DDC97;
+  --color-error: #FF4D4D;
 }
 
 body {
-  background-color: var(--bg);
-  color: var(--ink);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-main);
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
 }
@@ -29,10 +37,10 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: var(--color-stroke);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #444;
+  background: var(--color-surface-secondary);
 }
 

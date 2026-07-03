@@ -1,37 +1,46 @@
 import { Interactor } from '../core';
 import { RideState, RideStatus, Driver, RideListener } from './types';
 
-export class RideInteractor implements Interactor {
+/**
+ * Presenter interface that the View must implement
+ */
+export interface RidePresentable {
+  updateState(state: RideState): void;
+}
+
+export class RideInteractor extends Interactor {
   private state: RideState;
   private listener?: RideListener;
-  private updateCallback?: (state: RideState) => void;
+  private presenter?: RidePresentable;
 
   constructor(initialState: RideState, listener?: RideListener) {
+    super();
     this.state = initialState;
     this.listener = listener;
   }
 
-  setUpdateCallback(callback: (state: RideState) => void) {
-    this.updateCallback = callback;
-    callback(this.state);
+  public setPresenter(presenter: RidePresentable) {
+    this.presenter = presenter;
+    this.presenter.updateState(this.state);
   }
 
-  didBecomeActive() {
-    console.log('RideInteractor active');
+  public didBecomeActive() {
+    super.didBecomeActive();
+    console.log('RideInteractor: Active');
   }
 
-  willResignActive() {
-    console.log('RideInteractor resigning');
+  public willResignActive() {
+    super.willResignActive();
+    console.log('RideInteractor: Resigning');
   }
 
-  async requestRide(destination: string) {
+  public async requestRide(destination: string) {
     this.updateState({ 
       status: 'SEARCHING',
       destination,
       ...this.calculateEstimate(destination)
     });
 
-    // Simulate driver matching for a Motorcycle
     try {
       const driver = await this.simulateDriverMatching();
       this.updateState({ status: 'ACCEPTED', driver });
@@ -40,7 +49,7 @@ export class RideInteractor implements Interactor {
     }
   }
 
-  cancelRide() {
+  public cancelRide() {
     this.updateState({ 
       status: 'IDLE', 
       destination: '', 
@@ -52,11 +61,10 @@ export class RideInteractor implements Interactor {
   }
 
   private calculateEstimate(destination: string) {
-    // Motorcycle specific pricing: cheaper and faster than cars
     const distance = Math.random() * 8 + 1;
     return {
-      price: Math.max(5, distance * 1.8), // MotoJá Premium is affordable
-      eta: Math.floor(distance * 1.5) // Motos are faster in traffic
+      price: Math.max(5, distance * 1.8),
+      eta: Math.floor(distance * 1.5)
     };
   }
 
@@ -76,6 +84,6 @@ export class RideInteractor implements Interactor {
 
   private updateState(newState: Partial<RideState>) {
     this.state = { ...this.state, ...newState };
-    this.updateCallback?.(this.state);
+    this.presenter?.updateState(this.state);
   }
 }

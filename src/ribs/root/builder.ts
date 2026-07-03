@@ -7,14 +7,8 @@ export interface RootDependency {
   // Global dependencies
 }
 
-export class RootBuilder implements Builder<RootDependency, RootRouter> {
-  dependency: RootDependency;
-
-  constructor(dependency: RootDependency) {
-    this.dependency = dependency;
-  }
-
-  build(): RootRouter {
+export class RootBuilder extends Builder<RootDependency, RootRouter> {
+  public build(): RootRouter {
     const interactor = new RootInteractor();
     const rideBuilder = new RideBuilder({});
     const router = new RootRouter(interactor, rideBuilder);
