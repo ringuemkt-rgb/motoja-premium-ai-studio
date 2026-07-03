@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
-import Map from './components/Map';
+import MotoJaMap from './components/MotoJaMap';
 import AICentral from './components/AICentral';
 import RideFlow from './components/RideFlow';
 import VisualStudio from './components/VisualStudio';
-import { Menu, Bell, User, Settings, History, Shield, HelpCircle, LogOut, Bike, CreditCard, X, Rotate3d } from 'lucide-react';
+import { Menu, Bell, Settings, History, Shield, HelpCircle, LogOut, Bike, CreditCard, X, Rotate3d, MapPinned } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from './utils/cn';
 import { RootBuilder } from './ribs/root/builder';
@@ -12,8 +12,7 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'app' | 'studio'>('app');
 
-  // RIBs Initialization
-  const { rootRouter, rideRouter } = useMemo(() => {
+  const { rideRouter } = useMemo(() => {
     const builder = new RootBuilder({});
     const root = builder.build();
     const ride = root.attachRide();
@@ -21,7 +20,7 @@ export default function App() {
   }, []);
 
   const menuItems = [
-    { icon: Bike, label: 'Minhas Corridas', active: true },
+    { icon: Bike, label: 'Solicitar corrida', active: true },
     { icon: History, label: 'Histórico' },
     { icon: CreditCard, label: 'Pagamento' },
     { icon: Shield, label: 'Segurança' },
@@ -30,35 +29,34 @@ export default function App() {
   ];
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-black text-white">
+    <div className="relative h-screen w-screen overflow-hidden bg-[#0B0B0E] text-white">
       {viewMode === 'studio' ? (
         <VisualStudio onBackToApp={() => setViewMode('app')} />
       ) : (
         <>
-          {/* Header */}
           <header className="fixed top-0 left-0 right-0 z-40 p-4 flex items-center justify-between pointer-events-none">
             <button
               onClick={() => setIsSidebarOpen(true)}
-              className="w-12 h-12 bg-[#151619] border border-white/10 rounded-2xl flex items-center justify-center shadow-xl pointer-events-auto active:scale-95 transition-transform"
+              className="w-12 h-12 bg-[#15151A]/90 border border-[#25252D] rounded-2xl flex items-center justify-center shadow-xl pointer-events-auto active:scale-95 transition-transform backdrop-blur"
+              aria-label="Abrir menu"
             >
               <Menu className="w-6 h-6" />
             </button>
 
-            <div className="bg-[#151619] border border-white/10 px-4 py-2 rounded-2xl shadow-xl flex items-center gap-2 pointer-events-auto">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-xs font-bold tracking-tight uppercase">MotoJá Premium</span>
+            <div className="bg-[#15151A]/90 border border-[#25252D] px-4 py-2 rounded-2xl shadow-xl flex items-center gap-2 pointer-events-auto backdrop-blur">
+              <div className="w-2 h-2 bg-[#3DDC97] rounded-full animate-pulse" />
+              <span className="text-xs font-black tracking-tight uppercase">MotoJá • Ituberá-BA</span>
             </div>
 
-            <button 
+            <button
               onClick={() => setViewMode('studio')}
-              className="px-4 h-12 bg-[#151619] border border-gold/30 text-gold rounded-2xl flex items-center gap-2 shadow-xl pointer-events-auto active:scale-95 transition-all hover:bg-gold/5 font-extrabold text-xs"
+              className="px-4 h-12 bg-[#15151A]/90 border border-[#FFC107]/30 text-[#FFC107] rounded-2xl flex items-center gap-2 shadow-xl pointer-events-auto active:scale-95 transition-all hover:bg-[#FFC107]/5 font-black text-xs backdrop-blur"
             >
-              <Rotate3d className="w-5 h-5 text-gold animate-spin-slow" />
-              <span>Estúdio 3D</span>
+              <Rotate3d className="w-5 h-5 text-[#FFC107]" />
+              <span>Estúdio</span>
             </button>
           </header>
 
-          {/* Sidebar Overlay */}
           <AnimatePresence>
             {isSidebarOpen && (
               <>
@@ -74,38 +72,30 @@ export default function App() {
                   animate={{ x: 0 }}
                   exit={{ x: '-100%' }}
                   transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                  className="fixed top-0 left-0 bottom-0 w-80 bg-[#151619] border-r border-white/10 z-[70] p-6 flex flex-col"
+                  className="fixed top-0 left-0 bottom-0 w-80 bg-[#15151A] border-r border-[#25252D] z-[70] p-6 flex flex-col"
                 >
                   <div className="flex items-center justify-between mb-10">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-orange-500 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/20">
-                        <Bike className="text-white w-7 h-7" />
+                      <div className="w-12 h-12 bg-[#FFC107]/10 border border-[#FFC107]/25 rounded-2xl flex items-center justify-center shadow-lg shadow-[#FFC107]/10">
+                        <Bike className="text-[#FFC107] w-7 h-7" />
                       </div>
                       <div>
-                        <h1 className="text-xl font-black italic tracking-tighter">MOTOJÁ</h1>
-                        <p className="text-[10px] text-orange-500 font-bold uppercase tracking-widest">Premium Edition</p>
+                        <h1 className="text-xl font-black tracking-tighter">MOTOJÁ</h1>
+                        <p className="text-[10px] text-[#FFC107] font-black uppercase tracking-widest">Premium Local</p>
                       </div>
                     </div>
-                    <button 
-                      onClick={() => setIsSidebarOpen(false)}
-                      className="p-2 hover:bg-white/5 rounded-full transition-colors"
-                    >
+                    <button onClick={() => setIsSidebarOpen(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
                       <X className="w-6 h-6 opacity-40" />
                     </button>
                   </div>
 
                   <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 mb-8">
-                    <div className="w-12 h-12 bg-white/10 rounded-xl overflow-hidden">
-                      <img 
-                        src="https://picsum.photos/seed/user/200" 
-                        alt="User" 
-                        className="w-full h-full object-cover"
-                        referrerPolicy="no-referrer"
-                      />
+                    <div className="w-12 h-12 bg-[#FFC107]/10 rounded-xl flex items-center justify-center border border-[#FFC107]/20">
+                      <MapPinned className="w-6 h-6 text-[#FFC107]" />
                     </div>
                     <div>
-                      <p className="font-bold">Olá, Usuário</p>
-                      <p className="text-xs text-white/40">Nível Bronze • 120 pts</p>
+                      <p className="font-bold">Olá, passageiro</p>
+                      <p className="text-xs text-[#B8B8C2]">Verificado • Ituberá-BA</p>
                     </div>
                   </div>
 
@@ -114,11 +104,11 @@ export default function App() {
                       <button
                         key={item.label}
                         className={cn(
-                          "w-full flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all group",
-                          item.active ? "bg-orange-500 text-white" : "hover:bg-white/5 text-white/60 hover:text-white"
+                          'w-full flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all group',
+                          item.active ? 'bg-[#FFC107] text-black' : 'hover:bg-white/5 text-white/60 hover:text-white'
                         )}
                       >
-                        <item.icon className={cn("w-5 h-5", item.active ? "text-white" : "text-white/40 group-hover:text-white")} />
+                        <item.icon className={cn('w-5 h-5', item.active ? 'text-black' : 'text-white/40 group-hover:text-white')} />
                         <span className="text-sm font-semibold">{item.label}</span>
                       </button>
                     ))}
@@ -128,14 +118,14 @@ export default function App() {
                         setViewMode('studio');
                         setIsSidebarOpen(false);
                       }}
-                      className="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all group border border-gold/20 bg-gold/5 text-gold hover:bg-gold/10"
+                      className="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all group border border-[#FFC107]/20 bg-[#FFC107]/5 text-[#FFC107] hover:bg-[#FFC107]/10"
                     >
-                      <Rotate3d className="w-5 h-5 text-gold" />
-                      <span className="text-sm font-bold">Estúdio 3D Premium</span>
+                      <Rotate3d className="w-5 h-5 text-[#FFC107]" />
+                      <span className="text-sm font-bold">Estúdio visual premium</span>
                     </button>
                   </nav>
 
-                  <button className="flex items-center gap-4 px-4 py-4 text-red-500/60 hover:text-red-500 transition-colors mt-auto">
+                  <button className="flex items-center gap-4 px-4 py-4 text-[#FF4D4D]/70 hover:text-[#FF4D4D] transition-colors mt-auto">
                     <LogOut className="w-5 h-5" />
                     <span className="text-sm font-bold">Sair da conta</span>
                   </button>
@@ -144,15 +134,17 @@ export default function App() {
             )}
           </AnimatePresence>
 
-          {/* Main Content */}
           <main className="h-full w-full">
-            <Map />
+            <MotoJaMap />
             <RideFlow interactor={rideRouter.interactor} />
             <AICentral />
           </main>
 
-          {/* Bottom Safe Area Background (for mobile) */}
-          <div className="fixed bottom-0 left-0 right-0 h-8 bg-[#151619] z-20 sm:hidden" />
+          <button className="fixed right-4 top-24 z-40 h-12 w-12 rounded-2xl border border-[#25252D] bg-[#15151A]/90 shadow-xl backdrop-blur flex items-center justify-center">
+            <Bell className="h-5 w-5 text-[#FFC107]" />
+          </button>
+
+          <div className="fixed bottom-0 left-0 right-0 h-8 bg-[#15151A] z-20 sm:hidden" />
         </>
       )}
     </div>
