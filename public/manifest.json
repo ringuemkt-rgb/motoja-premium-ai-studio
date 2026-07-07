@@ -1,16 +1,20 @@
 {
   "name": "MotoJá Premium",
   "short_name": "MotoJá",
-  "description": "Serviço Premium de Mototáxi e Entregas",
+  "description": "Mobilidade local, mototáxi e entregas rápidas em Ituberá-BA.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0a0a0a",
-  "theme_color": "#f27d26",
+  "orientation": "portrait-primary",
+  "background_color": "#0B0B0E",
+  "theme_color": "#0B0B0E",
+  "lang": "pt-BR",
+  "categories": ["transportation", "business", "navigation"],
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/198/198416.png",
-      "sizes": "512x512",
-      "type": "image/png",
+      "src": "/motoja-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ]
