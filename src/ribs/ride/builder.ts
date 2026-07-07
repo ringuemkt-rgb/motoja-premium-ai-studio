@@ -8,22 +8,25 @@ import { RideRouter } from './router';
  * This is where dependency injection happens.
  */
 export class RideBuilder extends Builder<RideDependency, RideRouter> {
-  
   public build(listener?: RideListener): RideRouter {
     const initialState: RideState = {
       status: 'IDLE',
-      origin: 'Minha Localização',
+      origin: 'Centro de Ituberá-BA',
       destination: '',
+      category: 'MotoJá Normal',
+      distanceKm: 0,
       price: 0,
-      eta: 0
+      eta: 0,
+      financials: {
+        priceCents: 0,
+        platformFeeCents: 0,
+        driverEarningCents: 0,
+      },
     };
 
-    // 1. Create Interactor
     const interactor = new RideInteractor(initialState, listener);
-    
-    // 2. Create Router
     const router = new RideRouter(interactor);
-    
+
     return router;
   }
 }

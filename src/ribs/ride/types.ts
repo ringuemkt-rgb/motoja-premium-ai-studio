@@ -1,4 +1,19 @@
-export type RideStatus = 'IDLE' | 'SEARCHING' | 'ACCEPTED' | 'ARRIVING' | 'IN_PROGRESS' | 'COMPLETED';
+export type RideStatus =
+  | 'IDLE'
+  | 'REQUESTED'
+  | 'MATCHING'
+  | 'ACCEPTED'
+  | 'ARRIVING'
+  | 'IN_TRIP'
+  | 'COMPLETED'
+  | 'CANCELED';
+
+export type RideCategory = 'MotoJá Normal' | 'MotoJá Expresso' | 'Entrega' | 'Farmácia';
+
+export interface DriverBadge {
+  code: 'verified_driver' | 'excellent_service' | 'high_punctuality' | 'premium';
+  label: string;
+}
 
 export interface Driver {
   name: string;
@@ -6,14 +21,25 @@ export interface Driver {
   plate: string;
   photo: string;
   vehicle: string;
+  badges?: DriverBadge[];
+  etaMin?: number;
+}
+
+export interface RideFinancials {
+  priceCents: number;
+  platformFeeCents: number;
+  driverEarningCents: number;
 }
 
 export interface RideState {
   status: RideStatus;
   origin: string;
   destination: string;
-  price: number;
+  category: RideCategory;
+  distanceKm: number;
   eta: number;
+  price: number;
+  financials: RideFinancials;
   driver?: Driver;
 }
 
@@ -23,5 +49,9 @@ export interface RideListener {
 }
 
 export interface RideDependency {
-  // Dependencies passed from parent
+  // Future production dependencies:
+  // - rideRepository
+  // - pricingService
+  // - notificationService
+  // - analyticsService
 }
