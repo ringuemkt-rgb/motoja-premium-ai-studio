@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { MapContainer, Marker, Popup, TileLayer, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import { io } from 'socket.io-client';
@@ -29,25 +29,33 @@ const createMotoIcon = (color: string) => {
   </svg>`;
 
   return new L.Icon({
-    iconUrl: `data:image/svg+xml;base64,${btoa(svg)}`,
+    iconUrl: `data:image/svg+xml;base64,${window.btoa(svg)}`,
     iconSize: [44, 44],
     iconAnchor: [22, 22],
     popupAnchor: [0, -20],
   });
 };
 
-const availableIcon = createMotoIcon('#FFC107');
-const deliveryIcon = createMotoIcon('#4A90E2');
-const userIcon = createMotoIcon('#3DDC97');
-
 export default function MotoJaMap() {
   const [drivers, setDrivers] = useState<DriverPosition[]>([]);
   const [userPosition, setUserPosition] = useState<[number, number]>(ITUBERA_CENTER);
 
+  const icons = useMemo(
+    () => ({
+      available: createMotoIcon('#FFC107'),
+      delivery: createMotoIcon('#4A90E2'),
+      user: createMotoIcon('#3DDC97'),
+    }),
+    []
+  );
+
   useEffect(() => {
     const socket = io();
     socket.on('drivers_update', (updatedDrivers: DriverPosition[]) => setDrivers(updatedDrivers));
-    return () => socket.disconnect();
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -68,7 +76,7 @@ export default function MotoJaMap() {
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         />
 
-        <Marker position={userPosition} icon={userIcon}>
+        <Marker position={userPosition} icon={icons.user}>
           <Popup>Você está aqui</Popup>
         </Marker>
 
@@ -78,7 +86,7 @@ export default function MotoJaMap() {
           <Marker
             key={driver.id}
             position={[driver.lat, driver.lng]}
-            icon={driver.type === 'delivery' ? deliveryIcon : availableIcon}
+            icon={driver.type === 'delivery' ? icons.delivery : icons.available}
           >
             <Popup>
               <div className="text-center">
