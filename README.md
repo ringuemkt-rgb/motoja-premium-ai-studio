@@ -27,6 +27,8 @@ A proposta central da marca:
 - Express para API local
 - Motion / Framer-style animation
 - Lucide React
+- PWA básico com manifest + service worker
+- GitHub Actions para checagem de build
 
 ---
 
@@ -42,21 +44,6 @@ A proposta central da marca:
   - Entrega
   - Farmácia
 - Região piloto: **Ituberá-BA**
-
----
-
-## Arquitetura recomendada para produção
-
-A versão atual é uma base web/PWA demonstrável. Para produção real, a arquitetura recomendada é:
-
-1. **Flutter** para passageiro e piloto.
-2. **Firebase Auth** para autenticação.
-3. **Cloud Firestore** como banco operacional.
-4. **Cloud Functions** para lógica autoritativa de preço, corrida e repasse.
-5. **FCM** para notificações.
-6. **Google Maps/OpenStreetMap** para mapas.
-7. **Crashlytics, Analytics e Remote Config** para observabilidade.
-8. Backend sidecar opcional para IA operacional quando houver tração real.
 
 ---
 
@@ -84,6 +71,7 @@ npm run dev       # inicia servidor Express + Vite
 npm run build     # build de produção
 npm run preview   # preview Vite
 npm run lint      # checagem TypeScript
+npm run check     # lint + build
 npm run clean     # remove dist
 ```
 
@@ -95,6 +83,7 @@ npm run clean     # remove dist
 src/
   App.tsx
   components/
+    MotoJaMap.tsx
     Map.tsx
     RideFlow.tsx
     AICentral.tsx
@@ -104,14 +93,63 @@ src/
       interactor.ts
       types.ts
   utils/
+public/
+  manifest.json
+  service-worker.js
+  motoja-icon.svg
 server.ts
 docs/
 AGENTS.md
+.github/workflows/ci.yml
 ```
 
 ---
 
-## O que foi revisado nesta fase
+## Endpoints demo
+
+A API local atual está documentada em:
+
+```text
+docs/API_CONTRACT.md
+```
+
+Endpoints principais:
+
+- `GET /api/health`
+- `GET /api/drivers/active`
+- `POST /api/rides`
+- `POST /api/rides/:rideId/accept`
+- `POST /api/rides/:rideId/status`
+- `GET /api/rides`
+- `GET /api/rides/:rideId/events`
+
+---
+
+## Documentação importante
+
+- `AGENTS.md` — regras para Codex/Gemini/agentes.
+- `docs/ENTERPRISE_REVIEW.md` — diagnóstico enterprise.
+- `docs/API_CONTRACT.md` — contrato da API demo.
+- `docs/REPOSITORY_CLEANUP_REPORT.md` — relatório de limpeza e correções.
+
+---
+
+## Arquitetura recomendada para produção
+
+A versão atual é uma base web/PWA demonstrável. Para produção real, a arquitetura recomendada é:
+
+1. **Flutter** para passageiro e piloto.
+2. **Firebase Auth** para autenticação.
+3. **Cloud Firestore** como banco operacional.
+4. **Cloud Functions** para lógica autoritativa de preço, corrida e repasse.
+5. **FCM** para notificações.
+6. **Google Maps/OpenStreetMap** para mapas.
+7. **Crashlytics, Analytics e Remote Config** para observabilidade.
+8. Backend sidecar opcional para IA operacional quando houver tração real.
+
+---
+
+## O que já foi revisado
 
 - Padronização de regras de negócio do MotoJá.
 - Correção de preço mínimo para R$12.
@@ -119,15 +157,18 @@ AGENTS.md
 - Organização de documentação técnica.
 - Inclusão de diretrizes para agentes de IA/Codex.
 - Preparação para evolução em backend autoritativo.
+- PWA corrigido com manifest, service worker e ícone local.
+- CI adicionado para checar TypeScript e build.
+- Contrato de API local documentado.
 
 ---
 
 ## Próximas prioridades
 
-1. Fechar fluxo do passageiro.
-2. Criar área do piloto.
-3. Criar admin operacional.
-4. Integrar backend persistente.
+1. Conectar totalmente `RideInteractor` ao endpoint `/api/rides`.
+2. Criar módulo do piloto.
+3. Criar módulo admin operacional.
+4. Migrar persistência para Firebase/Firestore ou backend real.
 5. Adicionar notificações.
 6. Preparar versão APK/PWA instalável.
 
