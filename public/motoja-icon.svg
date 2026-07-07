@@ -1,0 +1,11 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="112" fill="#0B0B0E"/>
+  <rect x="36" y="36" width="440" height="440" rx="92" fill="#15151A" stroke="#FFC107" stroke-width="10"/>
+  <circle cx="256" cy="256" r="154" fill="#0B0B0E" stroke="#D4AF37" stroke-width="8"/>
+  <path d="M145 293C145 316.196 163.804 335 187 335C210.196 335 229 316.196 229 293C229 269.804 210.196 251 187 251C163.804 251 145 269.804 145 293Z" fill="#FFC107"/>
+  <path d="M283 293C283 316.196 301.804 335 325 335C348.196 335 367 316.196 367 293C367 269.804 348.196 251 325 251C301.804 251 283 269.804 283 293Z" fill="#FFC107"/>
+  <path d="M187 293H325L298 205H235L214 293M298 205L275 151H235" stroke="#FFC107" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M126 159H201" stroke="#FFD86B" stroke-width="18" stroke-linecap="round"/>
+  <path d="M105 207H172" stroke="#FFD86B" stroke-width="18" stroke-linecap="round" opacity="0.75"/>
+  <text x="256" y="424" text-anchor="middle" font-family="Arial, sans-serif" font-size="58" font-weight="900" fill="#FFFFFF">MOTOJÁ</text>
+</svg>
