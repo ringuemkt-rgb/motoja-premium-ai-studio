@@ -23,5 +23,6 @@
     "allowImportingTsExtensions": true,
     "noEmit": true
   },
-  "exclude": ["node_modules", "dist"]
+  "include": ["src", "server.ts", "vite.config.ts"],
+  "exclude": ["node_modules", "dist", "apps/mobile"]
 }

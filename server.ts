@@ -10,6 +10,12 @@ const __dirname = path.dirname(__filename);
 
 const MINIMUM_FARE_CENTS = 1200;
 const PLATFORM_FEE_PERCENT = 0.2;
+const FARE_RULES: Record<string, { baseCents: number; perKmCents: number }> = {
+  NORMAL: { baseCents: 500, perKmCents: 220 },
+  EXPRESS: { baseCents: 650, perKmCents: 275 },
+  DELIVERY: { baseCents: 700, perKmCents: 240 },
+  PHARMACY: { baseCents: 750, perKmCents: 250 },
+};
 
 interface DriverPosition {
   id: string;
@@ -39,9 +45,19 @@ interface RideRecord {
   completedAt: string | null;
 }
 
+const normalizeCategory = (category: string) => {
+  const normalized = category.trim().toUpperCase();
+  if (normalized.includes("EXPRESS")) return "EXPRESS";
+  if (normalized.includes("FARM")) return "PHARMACY";
+  if (normalized.includes("ENTREGA") || normalized.includes("DELIVERY")) return "DELIVERY";
+  return "NORMAL";
+};
+
 const fareFor = (distanceKm: number, category: string) => {
-  const categoryMultiplier = category === "MotoJá Expresso" ? 1.25 : category === "Farmácia" ? 1.15 : category === "Entrega" ? 1.1 : 1;
-  const calculated = Math.round((900 + distanceKm * 220) * categoryMultiplier);
+  const categoryCode = normalizeCategory(category);
+  const rule = FARE_RULES[categoryCode] ?? FARE_RULES.NORMAL;
+  const safeDistanceKm = Math.max(0, Number.isFinite(distanceKm) ? distanceKm : 0);
+  const calculated = rule.baseCents + Math.round(safeDistanceKm * rule.perKmCents);
   const priceCents = Math.max(MINIMUM_FARE_CENTS, calculated);
   const platformFeeCents = Math.round(priceCents * PLATFORM_FEE_PERCENT);
   return {
@@ -74,6 +90,7 @@ async function startServer() {
   ];
 
   const rides = new Map<string, RideRecord>();
+  const rideIdempotency = new Map<string, string>();
   const rideEvents: Array<{ rideId: string; type: string; actorId: string; createdAt: string }> = [];
 
   setInterval(() => {
@@ -103,15 +120,35 @@ async function startServer() {
   });
 
   app.post("/api/rides", (req, res) => {
+    const idempotencyKey = req.header("Idempotency-Key")?.trim();
+    if (idempotencyKey) {
+      const existingId = rideIdempotency.get(idempotencyKey);
+      const existingRide = existingId ? rides.get(existingId) : null;
+      if (existingRide) return res.status(200).json(existingRide);
+    }
+
     const {
       passengerId = "demo-passenger",
-      category = "MotoJá Normal",
-      origin = { address: "Centro de Ituberá-BA", lat: -13.7288, lng: -39.1494 },
-      destination = { address: "Praça Central", lat: -13.731, lng: -39.145 },
+      category = "NORMAL",
+      pickupAddress,
+      dropoffAddress,
+      pickup,
+      dropoff,
+      origin = pickup
+        ? { address: pickupAddress ?? "Partida", lat: pickup.latitude, lng: pickup.longitude }
+        : { address: "Centro de Ituberá-BA", lat: -13.7288, lng: -39.1494 },
+      destination = dropoff
+        ? { address: dropoffAddress ?? "Destino", lat: dropoff.latitude, lng: dropoff.longitude }
+        : { address: "Praça Central", lat: -13.731, lng: -39.145 },
       distanceKm = 2.5,
+      quote,
     } = req.body ?? {};
 
-    const financials = fareFor(Number(distanceKm), category);
+    const authoritativeDistanceKm = quote?.distanceMeters != null
+      ? Number(quote.distanceMeters) / 1000
+      : Number(distanceKm);
+    const categoryCode = normalizeCategory(String(category));
+    const financials = fareFor(authoritativeDistanceKm, categoryCode);
     const rideId = `ride-${Date.now()}`;
     const now = new Date().toISOString();
     const ride: RideRecord = {
@@ -119,10 +156,10 @@ async function startServer() {
       status: "REQUESTED",
       passengerId,
       driverId: null,
-      category,
+      category: categoryCode,
       origin,
       destination,
-      distanceKm: Number(distanceKm),
+      distanceKm: authoritativeDistanceKm,
       ...financials,
       requestedAt: now,
       acceptedAt: null,
@@ -130,6 +167,7 @@ async function startServer() {
     };
 
     rides.set(rideId, ride);
+    if (idempotencyKey) rideIdempotency.set(idempotencyKey, rideId);
     rideEvents.push({ rideId, type: "RIDE_REQUESTED", actorId: passengerId, createdAt: now });
     io.emit("ride_created", ride);
     res.status(201).json(ride);

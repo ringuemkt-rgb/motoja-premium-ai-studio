@@ -1,179 +1,137 @@
-# MotoJá Premium AI Studio 🏍️
+# MotoJá — mobilidade e entregas no Baixo Sul
 
-Aplicativo web/mobile-first para demonstração operacional da **MotoJá**, plataforma regional de mobilidade, mototáxi, entregas rápidas, farmácia e logística local para **Ituberá-BA** e Baixo Sul da Bahia.
+Base oficial do **MotoJá**, plataforma regional de mototáxi, entregas, farmácia e logística local para Ituberá, Nilo Peçanha, Valença e municípios do Baixo Sul da Bahia.
 
-Este repositório nasceu no Google AI Studio, mas foi reorganizado para seguir uma linha mais profissional de produto: **experiência do passageiro, operação do piloto, painel administrativo, backend autoritativo e inteligência operacional**.
+O repositório contém dois produtos executáveis:
 
----
+- `apps/mobile`: aplicativo Android oficial em React Native, Expo SDK 57 e TypeScript;
+- raiz do projeto: site/PWA institucional e demonstração operacional em React + Vite, com API Express/Socket.IO local.
 
-## Objetivo
+> MVP de homologação. Cobrança Pix, autenticação OTP, KYC documental e custódia de evidências ainda precisam de provedores reais antes da operação pública.
 
-Construir uma base testável, bonita e evolutiva do MotoJá, com padrão visual premium semelhante a apps grandes de mobilidade, mas adaptada ao mercado local.
+## Regras canônicas
 
-A proposta central da marca:
+- corrida mínima: **R$ 12,00** (`1200` centavos);
+- plataforma: **20%**;
+- piloto parceiro: **80%**;
+- categorias: MotoJá Normal, MotoJá Expresso, Entrega e Farmácia;
+- região piloto: Ituberá e Baixo Sul da Bahia.
 
-> **Mobilidade local com padrão profissional.**
+Dinheiro é tratado em centavos inteiros. O backend recalcula valores recebidos e mutações de corrida usam chave de idempotência.
 
----
+## Aplicativo Android
 
-## Stack atual
+O APK atual oferece:
 
-- React 19
-- Vite
-- TypeScript
-- TailwindCSS v4
-- Leaflet / OpenStreetMap
-- Socket.IO para simulação em tempo real
-- Express para API local
-- Motion / Framer-style animation
-- Lucide React
-- PWA básico com manifest + service worker
-- GitHub Actions para checagem de build
+- perfis de cliente e piloto parceiro;
+- aceite de Termos/LGPD com timestamp, IP disponível, geolocalização autorizada, dispositivo e SHA-256;
+- transparência de preço e split antes da confirmação;
+- fila offline persistida com sincronização idempotente;
+- quatro categorias regionais;
+- entrega B2B com foto da coleta, assinatura e hash de comprovante;
+- online/offline escolhido pelo piloto, aceite e recusa sem punição automática;
+- localização em segundo plano somente durante disponibilidade operacional;
+- checklist de CNH, Seguro APP, antecedentes e EPI;
+- notificações contextuais, histórico e auditoria local;
+- fallback visual quando a chave Google Maps não estiver configurada.
 
----
-
-## Regras de negócio centrais
-
-- Corrida mínima: **R$ 12,00**
-- Split financeiro:
-  - **20% plataforma**
-  - **80% piloto**
-- Categorias:
-  - MotoJá Normal
-  - MotoJá Expresso
-  - Entrega
-  - Farmácia
-- Região piloto: **Ituberá-BA**
-
----
-
-## Rodar localmente
-
-**Pré-requisito:** Node.js 20+
+### Executar o mobile
 
 ```bash
-npm install
+cd apps/mobile
+npm ci
+cp .env.example .env.local
+npm test
+npm run typecheck
+npm start
+```
+
+Para permissões nativas e background location, use development build ou APK; o Expo Go não cobre todo o fluxo.
+
+### APK/AAB pelo EAS
+
+```bash
+cd apps/mobile
+npx eas-cli@21.0.1 login
+npx eas-cli@21.0.1 init
+npm run apk:eas
+npm run aab:eas
+```
+
+- `preview`: APK interno instalável;
+- `production`: AAB assinado para Google Play.
+
+O EAS deve custodiar a keystore de produção. Nunca versione `.jks`, tokens ou credenciais de serviço.
+
+Mais detalhes: [`apps/mobile/README.md`](apps/mobile/README.md).
+
+## Site e API local
+
+Pré-requisito: Node.js 22.
+
+```bash
+npm ci
 npm run dev
 ```
 
-Depois abra:
-
-```text
-http://localhost:3000
-```
-
----
-
-## Scripts
-
-```bash
-npm run dev       # inicia servidor Express + Vite
-npm run build     # build de produção
-npm run preview   # preview Vite
-npm run lint      # checagem TypeScript
-npm run check     # lint + build
-npm run clean     # remove dist
-```
-
----
-
-## Estrutura principal
-
-```text
-src/
-  App.tsx
-  components/
-    MotoJaMap.tsx
-    Map.tsx
-    RideFlow.tsx
-    AICentral.tsx
-    VisualStudio.tsx
-  ribs/
-    ride/
-      interactor.ts
-      types.ts
-  utils/
-public/
-  manifest.json
-  service-worker.js
-  motoja-icon.svg
-server.ts
-docs/
-AGENTS.md
-.github/workflows/ci.yml
-```
-
----
-
-## Endpoints demo
-
-A API local atual está documentada em:
-
-```text
-docs/API_CONTRACT.md
-```
+Abra `http://localhost:3000`.
 
 Endpoints principais:
 
 - `GET /api/health`
 - `GET /api/drivers/active`
-- `POST /api/rides`
+- `POST /api/rides` com `Idempotency-Key`
 - `POST /api/rides/:rideId/accept`
 - `POST /api/rides/:rideId/status`
 - `GET /api/rides`
 - `GET /api/rides/:rideId/events`
 
----
+O contrato da demonstração está em [`docs/API_CONTRACT.md`](docs/API_CONTRACT.md).
 
-## Documentação importante
+## Validação
 
-- `AGENTS.md` — regras para Codex/Gemini/agentes.
-- `docs/ENTERPRISE_REVIEW.md` — diagnóstico enterprise.
-- `docs/API_CONTRACT.md` — contrato da API demo.
-- `docs/REPOSITORY_CLEANUP_REPORT.md` — relatório de limpeza e correções.
+```bash
+npm run check
+npm run mobile:test
+npm run mobile:typecheck
+npm run mobile:export
+```
 
----
+Ou execute tudo:
 
-## Arquitetura recomendada para produção
+```bash
+npm run check:all
+```
 
-A versão atual é uma base web/PWA demonstrável. Para produção real, a arquitetura recomendada é:
+O GitHub Actions valida site/API e mobile em jobs separados com Node.js 22.
 
-1. **Flutter** para passageiro e piloto.
-2. **Firebase Auth** para autenticação.
-3. **Cloud Firestore** como banco operacional.
-4. **Cloud Functions** para lógica autoritativa de preço, corrida e repasse.
-5. **FCM** para notificações.
-6. **Google Maps/OpenStreetMap** para mapas.
-7. **Crashlytics, Analytics e Remote Config** para observabilidade.
-8. Backend sidecar opcional para IA operacional quando houver tração real.
+## Configuração pública do app
 
----
+Crie `apps/mobile/.env.local` a partir do exemplo:
 
-## O que já foi revisado
+```env
+EXPO_PUBLIC_API_URL=https://api.seu-dominio.com.br
+EXPO_PUBLIC_GOOGLE_MAPS_API_KEY=sua_chave_publica_restrita
+```
 
-- Padronização de regras de negócio do MotoJá.
-- Correção de preço mínimo para R$12.
-- Estruturação do fluxo de corrida com estados compatíveis com operação real.
-- Organização de documentação técnica.
-- Inclusão de diretrizes para agentes de IA/Codex.
-- Preparação para evolução em backend autoritativo.
-- PWA corrigido com manifest, service worker e ícone local.
-- CI adicionado para checar TypeScript e build.
-- Contrato de API local documentado.
+Restrinja a chave Maps ao package `br.com.motoja.app` e aos certificados corretos. Segredos de banco, JWT, HMAC, Pix e storage pertencem exclusivamente ao backend/EAS secret manager.
 
----
+## Estrutura
 
-## Próximas prioridades
+```text
+apps/mobile/                 Expo + React Native Android
+  src/components/           UI e comprovante de entrega
+  src/screens/              cliente, piloto, termos, atividade e perfil
+  src/services/             API offline e localização em background
+  src/store/                Zustand + AsyncStorage
+  app.config.ts             identidade e permissões nativas
+  eas.json                   debug, preview APK e production AAB
+src/                        site/PWA React
+server.ts                   API Express + Socket.IO de demonstração
+docs/                       contratos e decisões
+.github/workflows/ci.yml    gates automatizados
+```
 
-1. Conectar totalmente `RideInteractor` ao endpoint `/api/rides`.
-2. Criar módulo do piloto.
-3. Criar módulo admin operacional.
-4. Migrar persistência para Firebase/Firestore ou backend real.
-5. Adicionar notificações.
-6. Preparar versão APK/PWA instalável.
+## Limites antes de produção
 
----
-
-## Importante
-
-Este repositório ainda é uma base técnica/demo. Não deve ser anunciado como sistema de produção equivalente à Uber. O caminho correto é evoluir por fases: MVP local, operação piloto, backend real, monitoramento, depois escala.
+Para operação pública ainda são obrigatórios: autenticação real, PostgreSQL/PostGIS, storage privado de documentos/fotos, Pix homologado, antifraude, painel de suporte, observabilidade, política de privacidade publicada, revisão jurídica e testes em aparelhos físicos com rede fraca e otimização de bateria.
