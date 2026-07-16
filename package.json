@@ -9,7 +9,12 @@
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
-    "check": "npm run lint && npm run build"
+    "check": "npm run lint && npm run build",
+    "mobile:install": "npm --prefix apps/mobile ci",
+    "mobile:test": "npm --prefix apps/mobile test",
+    "mobile:typecheck": "npm --prefix apps/mobile run typecheck",
+    "mobile:export": "npm --prefix apps/mobile run export:android",
+    "check:all": "npm run check && npm run mobile:test && npm run mobile:typecheck && npm run mobile:export"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",
